@@ -6,7 +6,7 @@ module Myob
     class Client
       include Myob::Api::Helpers
 
-      attr_reader :current_company_file, :client, :current_company_file_url
+      attr_reader :current_company_file, :client, :current_company_file_url, :access_token, :refresh_token, :expires_at
 
       def initialize(options)
         Myob::Api::Model::Base.subclasses.each {|c| model(c.name.split("::").last)}
@@ -95,16 +95,51 @@ module Myob
         end
       end
 
-      def connection
-        if @refresh_token
-          @auth_connection ||= OAuth2::AccessToken.new(@client, @access_token, {
-            :refresh_token => @refresh_token
-          }).refresh!
-        else
-          @auth_connection ||= OAuth2::AccessToken.new(@client, @access_token)
-        end
+      # def connection
+      #   if @refresh_token
+      #     @auth_connection ||= OAuth2::AccessToken.new(@client, @access_token, {
+      #       :refresh_token => @refresh_token
+      #     }).refresh!
+      #   else
+      #     @auth_connection ||= OAuth2::AccessToken.new(@client, @access_token)
+      #   end
+      # end
+
+      def after_refresh &block
+        @refresh_callback = block
       end
 
+      def refresh!
+        @auth_connection ||= OAuth2::AccessToken.new(
+          @client, @access_token, {refresh_token: @refresh_token})
+
+        @token = @auth_connection.refresh!
+        @access_token  = @token.token
+        @expires_at    = @token.expires_at
+        @refresh_token = @token.refresh_token
+
+        @auth_connection = OAuth2::AccessToken.new(
+          @client, @access_token, {refresh_token: @refresh_token})
+
+        if @refresh_callback.present?
+          @refresh_callback.yield
+        end
+
+        @token
+      end
+
+      def connection
+        @auth_connection ||= begin
+          if @refresh_token
+            OAuth2::AccessToken.new(@client, @access_token, {refresh_token: @refresh_token})
+          else
+            OAuth2::AccessToken.new(@client, @access_token)
+          end
+        end
+        refresh! if @auto_refresh && @expires_at && @expires_at < Time.now.to_i
+        @auth_connection
+      end
+      
       private
       def company_files
         @company_files ||= self.company_file.all.to_a
