@@ -17,7 +17,7 @@ require 'myob/api/models/employee_standard_pay'
 
 require 'myob/api/models/employee_payroll_advice'
 
-require 'myob/api/models/inventory_item'
+require 'myob/api/models/item'
 
 require 'myob/api/models/customer_payment'
 require 'myob/api/models/invoice'
