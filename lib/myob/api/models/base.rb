@@ -52,7 +52,13 @@ module Myob
         end
 
         def save(object)
-          new_record?(object) ? create(object) : update(object)
+          response = new_record?(object) ? create(object) : update(object)
+          if response.body && response.body != ''
+            response
+          elsif response && response.headers['location']
+            uid = response.headers['location'].split('/').last
+            response = find(uid)
+          end
         end
 
         def destroy(object)

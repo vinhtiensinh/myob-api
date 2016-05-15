@@ -1,9 +1,9 @@
 module Myob
   module Api
     module Model
-      class Item < Base
+      class DebitSettlement < Base
         def model_route
-          'Inventory/Item'
+          'Purchase/DebitSettlement'
         end
       end
     end

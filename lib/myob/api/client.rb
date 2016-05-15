@@ -15,6 +15,7 @@ module Myob
         @consumer             = options[:consumer]
         @access_token         = options[:access_token]
         @refresh_token        = options[:refresh_token]
+        @auto_refresh        = options[:auto_refresh]
 
         @client               = OAuth2::Client.new(@consumer[:key], @consumer[:secret], {
           :site          => 'https://secure.myob.com',
