@@ -30,6 +30,9 @@ require 'myob/api/models/supplier_payment'
 require 'myob/api/models/credit_settlement'
 require 'myob/api/models/debit_settlement'
 
+require 'myob/api/models/credit_refund'
+require 'myob/api/models/debit_refund'
+
 require 'myob/api/models/payroll_category'
 require 'myob/api/models/wage'
 require 'myob/api/models/entitlement'
