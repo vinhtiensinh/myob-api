@@ -3,7 +3,7 @@ module Myob
     module Model
       class DebitRefund < Base
         def model_route
-          'Sale/DebitRefund'
+          'Purchase/DebitRefund'
         end
       end
     end
